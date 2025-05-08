@@ -1,0 +1,4 @@
+lxml==5.4.0
+Requests==2.32.3
+selenium==4.32.0
+tqdm==4.66.6
