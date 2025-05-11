@@ -94,35 +94,36 @@ def download_html(LF_id,NY):
             download_info=download_move_info(page)
             #(download_info)
             if '新番預告' in download_info[0][0]: 
-                print("\033[34m#\033[0m" * 40)
-                print(f"\033[33m{download_info[0][0]}   此片为新番預告跳过下载\033[0m")
-                print("\033[34m#\033[0m" * 40)
+                print("#" * 40)  
+                print(f"{download_info[0][0]}   此片为新番預告跳过下载")  
+                print("#" * 40)  
             else:
-                print("\033[34m#\033[0m" * 40)
-                print(f"\033[33m{download_info[0][0]}\033[0m")    
+                print("#" * 40) 
+                print(f"{download_info[0][0]}")   
                 pattern = r"-([^.]*)\." 
                 num=1     
                 for i in download_info[1]:                      
                     match = re.search(pattern, i)
                     if match:
                         quality = match.group(1)
-                        print(f"\033[33m{num}.选择下载视频质量： {quality}\033[0m")
+                        #print(f"\033[33m{num}.选择下载视频质量： {quality}\033[0m")
                         num+=1
                     else:
-                        print(f"\033[33m4.跳过下载\033[0m")   
+                        print(f"4.跳过下载")  
 
                      
-                user_input = input("请输入数字: ").strip() or 1
+                #user_input = input("请输入数字: ").strip() or 1
+                user_input = 1
                 if user_input == 4:
                     pass
                 else:
                     num_1=int(user_input)-1
-                    print(num_1,download_info[1][num_1])
+                    print('正在下载：',download_info[1][num_1])
                     download_file(LF_id,NY,download_info[1][num_1],f'./{NY}/{download_info[0][0]}.mp4')  #下载文件
 
 
     except Exception as e:
-            print(f"打开网页时发生错误,请检测网页https://hanime1.me/download?v={str(LF_id)}是否能打开")
+            print(f"打开网页时发生错误,请检测网页https://hanime1.me/download?v={LF_id}是否能打开") 
             browser.quit()
 
 def db_insert_xzzt(LF_ID,table_name):
@@ -167,6 +168,6 @@ def db_get_lfid(table_name):
 
 #aaa=download_move_info(content)  #download_html (105266)
 #print (aaa[1])  #download_html (105266)
-#download_html (105286,'202505')  
+#download_html (105286,'202505')
 
 

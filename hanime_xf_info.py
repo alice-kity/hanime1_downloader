@@ -41,7 +41,7 @@ def db_hanime_info(NY,id,LF_NAME_JP, LF_NAME_CN, LF_ZZGS, LF_FSRQ, LF_NR, LF_IMG
 
         except sqlite3.IntegrityError:
             # 如果插入失败，说明ID已经存在，可以选择更新或跳过
-            print(f"\033[31mID {lf_id} 已存在，跳过插入。\033[0m")
+            print(f"ID {lf_id} 已存在，跳过插入。")  
 
     # 提交事务
     conn.commit()
@@ -63,7 +63,7 @@ def html_info_to_db(NY,html_content):
             pure_digit_ids.append(element_id)
 
     # 输出结果
-    print(f"\033[33m已成功获取里番id：{pure_digit_ids}\033[0m")
+    print(f"已成功获取里番id：{pure_digit_ids}")
     #里番日文名
     LF_NAME_JP=[]
     #里番中文名
@@ -130,14 +130,14 @@ def get_hanime_xfyg_info(NY):
         #打印源码，防止乱码加上编码格式；
         #print(page)
         if 'Server Error' in page:
-            print(f"无{NY}里番页面,请检测输入是否正确")
+            print(f"无{NY}里番页面,请检测输入是否正确")  
         else:
             f=open('./html/'+str(NY)+'.html',mode="w",encoding="utf-8")
             f.write(page)
             f.close()
             html_info_to_db(NY,page)
     except Exception as e:
-        print(f"打开网页时发生错误,请检测网页https://hanime1.me/previews/"+str(NY)+"是否能打开")
+        print(f"打开网页时发生错误,请检测网页https://hanime1.me/previews/{NY}是否能打开")  
         browser.quit()
         return
   

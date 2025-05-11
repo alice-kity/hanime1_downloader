@@ -1,90 +1,86 @@
-from hanime_xf_info  import get_hanime_xfyg_info
-from download_nfo_img  import sc_nfo_jpg
-from download_move  import db_get_lfid
-from download_move  import download_html
+import tkinter as tk
+from tkinter import ttk, scrolledtext
+import sys
+from hanime_xf_info import get_hanime_xfyg_info
+from download_nfo_img import sc_nfo_jpg
+from download_move import db_get_lfid, download_html
 import os
+import threading
 
-def option1_1():
-    print("\033[34m#\033[0m" * 40)
-    user_input = input("请输入年月如（202504）: ") or 202504
-    get_hanime_xfyg_info(user_input)
+class GUIApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Hanime1里番下载器")
+        self.root.geometry("800x500")
+
+        # 创建输入组件
+        self.ny_var = tk.StringVar(value="202504")
+        ttk.Label(root, text="输入年月（如202504）:").grid(row=0, column=0, padx=10, pady=5)
+        ttk.Entry(root, textvariable=self.ny_var).grid(row=0, column=1, padx=10, pady=5)
+
+        # 创建功能按钮
+        ttk.Button(root, text="获取里番信息", command=self.start_get_info).grid(row=1, column=0, padx=10, pady=5)
+        ttk.Button(root, text="生成NFO和图片", command=self.start_gen_nfo).grid(row=1, column=1, padx=10, pady=5)
+        ttk.Button(root, text="下载里番", command=self.start_download).grid(row=1, column=2, padx=10, pady=5)
+        ttk.Button(root, text="退出", command=root.quit).grid(row=1, column=3, padx=10, pady=5)
+
+        # 创建输出文本框
+        self.output_area = scrolledtext.ScrolledText(root, wrap=tk.WORD, width=100, height=30)
+        self.output_area.grid(row=2, column=0, columnspan=4, padx=10, pady=10)
+        self.output_area.insert(tk.END, "欢迎使用hanime1里番下载器\n")
+        
+        # 重定向标准输出到文本框
+        sys.stdout = self
+
+    def write(self, text):
+        self.output_area.insert(tk.END, text)
+        self.output_area.see(tk.END)
+
+    def start_get_info(self):
+        threading.Thread(target=self.get_info, daemon=True).start()
+
+    def get_info(self):
+        ny = self.ny_var.get()
+        print("#" * 40)
+        get_hanime_xfyg_info(ny)
+
+    def start_gen_nfo(self):
+        threading.Thread(target=self.gen_nfo, daemon=True).start()
+
+    def gen_nfo(self):
+        ny = self.ny_var.get()
+        print("#" * 40)
+        if not os.path.exists(ny):
+            os.mkdir(ny)
+            print(f"目录 '{ny}' 已创建。")
+        else:
+            print(f"目录 '{ny}' 已存在。")
+        sc_nfo_jpg(ny)
+
+    def start_download(self):
+        threading.Thread(target=self.download, daemon=True).start()
+
+    def download(self):
+        ny = self.ny_var.get()
+        print("#" * 40)
+        if not os.path.exists(ny):
+            os.mkdir(ny)
+            print(f"目录 '{ny}' 已创建。")
+        else:
+            print(f"目录 '{ny}' 已存在。")
+        lf_data = db_get_lfid(ny)
+        if lf_data:
+            for row in lf_data:
+                LF_ID = row[0]
+                LF_NAME_CN = row[1]
+                print(LF_ID, LF_NAME_CN)
+                download_html(LF_ID, ny)
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = GUIApp(root)
     
-
-
-
- 
-def option1_2():
-    print("\033[34m#\033[0m" * 40)
-    user_input = input("请输入年月如（202504）: ") or 202504
-    if not os.path.exists(str(user_input)):
-        os.mkdir(str(user_input))
-        print(f"目录 '{str(user_input)}' 已创建。")
-    else:
-        print(f"目录 '{str(user_input)}' 已存在。")
-    sc_nfo_jpg(str(user_input))
- 
-def option1_3():
-    print("\033[34m#\033[0m" * 40)
-    user_input = input("请输入年月如（202504）: ") or 202504
-    if not os.path.exists(str(user_input)):
-        os.mkdir(str(user_input))
-        print(f"目录 '{str(user_input)}' 已创建。")
-    else:
-        print(f"目录 '{str(user_input)}' 已存在。")
-    lf_data=db_get_lfid(str(user_input))
-    if lf_data:
-        for row in lf_data:
-            #里番id
-            LF_ID = row[0]
-            #里番日文名
-            LF_NAME_CN=row[1]
-            #print(tags)
-            print(LF_ID,LF_NAME_CN) 
-            download_html (LF_ID,str(user_input))  
-
-
-
-
-def option1_4():
-    global state
-    state = False
-
-
-
-
- 
-options1 = {
-    '1': option1_1,
-    '2': option1_2,
-    '3': option1_3,
-    '4': option1_4,
-
-
-}
-
-#合集过滤条件
-
-state = True
-# 主程序
-while state:
-    # 显示菜单
-    print("\033[34m#\033[0m" * 40)
-    print("\033[33m欢迎使用hanime1里番下载器\033[0m")
-    print("\033[34m#\033[0m" * 40)
-    print("\033[33m1. 获取里番信息并写入SQLite3数据库\033[0m")
-    print("\033[33m2. 生成nfo和图片\033[0m")
-    print("\033[33m3. 下载SQLite3数据库中的里番\033[0m")
-    print("\033[33m4. 退出\033[0m")
-    print("\033[34m#\033[0m" * 40)
-    
-    # 获取用户输入
-    user_input = input("请输入数字: ").strip()
-    
-    if user_input in options1:
-        # 调用对应的函数
-        options1[user_input]()  # 假设options1是一个字典，键是字符串，值是函数
-    else:
-        print("\033[31m无效的输入，请重新输入！\033[0m")
+    root.mainloop()
 
 
 
